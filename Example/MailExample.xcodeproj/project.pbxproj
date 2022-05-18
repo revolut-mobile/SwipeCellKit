@@ -11,6 +11,7 @@
 		290FF0C22823EB0300212EAE /* SwipeCellKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 290FF0C02823EB0300212EAE /* SwipeCellKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		290FF0C72823EBC200212EAE /* RoundedCornersActionContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 290FF0C62823EBC200212EAE /* RoundedCornersActionContentView.swift */; };
 		290FF0C92823EC6000212EAE /* UIColor+Highlighted.swift in Sources */ = {isa = PBXBuildFile; fileRef = 290FF0C82823EC6000212EAE /* UIColor+Highlighted.swift */; };
+		291D91482835380B00FCA894 /* MailExampleUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 291D91472835380B00FCA894 /* MailExampleUITests.swift */; };
 		29FC1CF62822AD2A00F48AA8 /* CustomMailCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29FC1CF52822AD2A00F48AA8 /* CustomMailCollectionViewController.swift */; };
 		3F234B0A1E44AC2600E22A38 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F234B041E44AC2600E22A38 /* AppDelegate.swift */; };
 		3F234B0B1E44AC2600E22A38 /* MailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F234B051E44AC2600E22A38 /* MailTableViewController.swift */; };
@@ -21,6 +22,16 @@
 		B93ECA9D1EDEF1EA00AE05AD /* MailCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B93ECA9C1EDEF1EA00AE05AD /* MailCollectionViewController.swift */; };
 		B93ECA9F1EDEF56300AE05AD /* Shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = B93ECA9E1EDEF56300AE05AD /* Shared.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		291D914B2835380B00FCA894 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3F234ADB1E44AA5E00E22A38 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3F234AE21E44AA5E00E22A38;
+			remoteInfo = MailExample;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		290FF0C32823EB0300212EAE /* Embed Frameworks */ = {
@@ -41,6 +52,8 @@
 		290FF0C02823EB0300212EAE /* SwipeCellKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SwipeCellKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		290FF0C62823EBC200212EAE /* RoundedCornersActionContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedCornersActionContentView.swift; sourceTree = "<group>"; };
 		290FF0C82823EC6000212EAE /* UIColor+Highlighted.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Highlighted.swift"; sourceTree = "<group>"; };
+		291D91452835380B00FCA894 /* MailExampleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MailExampleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		291D91472835380B00FCA894 /* MailExampleUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailExampleUITests.swift; sourceTree = "<group>"; };
 		29FC1CF52822AD2A00F48AA8 /* CustomMailCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomMailCollectionViewController.swift; sourceTree = "<group>"; };
 		3F234AE31E44AA5E00E22A38 /* MailExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MailExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F234AF21E44AA5E00E22A38 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -55,6 +68,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		291D91422835380B00FCA894 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3F234AE01E44AA5E00E22A38 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -82,11 +102,20 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		291D91462835380B00FCA894 /* MailExampleUITests */ = {
+			isa = PBXGroup;
+			children = (
+				291D91472835380B00FCA894 /* MailExampleUITests.swift */,
+			);
+			path = MailExampleUITests;
+			sourceTree = "<group>";
+		};
 		3F234ADA1E44AA5E00E22A38 = {
 			isa = PBXGroup;
 			children = (
 				290FF0B32823EA1500212EAE /* Packages */,
 				3F234AE51E44AA5E00E22A38 /* Source */,
+				291D91462835380B00FCA894 /* MailExampleUITests */,
 				3F234AE41E44AA5E00E22A38 /* Products */,
 				290FF0B72823EA5F00212EAE /* Frameworks */,
 			);
@@ -96,6 +125,7 @@
 			isa = PBXGroup;
 			children = (
 				3F234AE31E44AA5E00E22A38 /* MailExample.app */,
+				291D91452835380B00FCA894 /* MailExampleUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -131,6 +161,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		291D91442835380B00FCA894 /* MailExampleUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 291D914F2835380B00FCA894 /* Build configuration list for PBXNativeTarget "MailExampleUITests" */;
+			buildPhases = (
+				291D91412835380B00FCA894 /* Sources */,
+				291D91422835380B00FCA894 /* Frameworks */,
+				291D91432835380B00FCA894 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				291D914C2835380B00FCA894 /* PBXTargetDependency */,
+			);
+			name = MailExampleUITests;
+			productName = MailExampleUITests;
+			productReference = 291D91452835380B00FCA894 /* MailExampleUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		3F234AE21E44AA5E00E22A38 /* MailExample */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3F234AF51E44AA5E00E22A38 /* Build configuration list for PBXNativeTarget "MailExample" */;
@@ -157,9 +205,14 @@
 		3F234ADB1E44AA5E00E22A38 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0820;
+				LastSwiftUpdateCheck = 1320;
 				LastUpgradeCheck = 1100;
 				TargetAttributes = {
+					291D91442835380B00FCA894 = {
+						CreatedOnToolsVersion = 13.2.1;
+						ProvisioningStyle = Automatic;
+						TestTargetID = 3F234AE21E44AA5E00E22A38;
+					};
 					3F234AE21E44AA5E00E22A38 = {
 						CreatedOnToolsVersion = 8.2.1;
 						DevelopmentTeam = 8XNJ93W9ZP;
@@ -182,11 +235,19 @@
 			projectRoot = "";
 			targets = (
 				3F234AE21E44AA5E00E22A38 /* MailExample */,
+				291D91442835380B00FCA894 /* MailExampleUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		291D91432835380B00FCA894 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3F234AE11E44AA5E00E22A38 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -200,6 +261,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		291D91412835380B00FCA894 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				291D91482835380B00FCA894 /* MailExampleUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3F234ADF1E44AA5E00E22A38 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -217,7 +286,64 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		291D914C2835380B00FCA894 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3F234AE21E44AA5E00E22A38 /* MailExample */;
+			targetProxy = 291D914B2835380B00FCA894 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		291D914D2835380B00FCA894 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ilia.MailExampleUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = MailExample;
+			};
+			name = Debug;
+		};
+		291D914E2835380B00FCA894 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ilia.MailExampleUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = MailExample;
+			};
+			name = Release;
+		};
 		3F234AF31E44AA5E00E22A38 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -361,6 +487,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		291D914F2835380B00FCA894 /* Build configuration list for PBXNativeTarget "MailExampleUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				291D914D2835380B00FCA894 /* Debug */,
+				291D914E2835380B00FCA894 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		3F234ADE1E44AA5E00E22A38 /* Build configuration list for PBXProject "MailExample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

@@ -140,6 +140,7 @@ extension CustomMailCollectionViewController: SwipeCollectionViewCellDelegate {
         } else {
             let flag = SwipeAction(style: .default, title: nil, handler: nil)
             flag.hidesWhenSelected = true
+            flag.accessibilityLabel = "Accessible Button"
             configure(action: flag, with: .flag)
             
             let delete = SwipeAction(style: .destructive, title: nil) { action, indexPath in

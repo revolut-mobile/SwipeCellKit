@@ -20,6 +20,8 @@ class SwipeActionButton: UIControl {
         self.init(frame: .zero)
         addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapControl)))
 
+        accessibilityTraits = UIAccessibilityTraits.button
+        accessibilityLabel = action.accessibilityLabel ?? action.title
         contentView = contentViewBuilder(action)
         contentView.isUserInteractionEnabled = false
         contentView.translatesAutoresizingMaskIntoConstraints = false
