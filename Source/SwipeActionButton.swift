@@ -25,6 +25,8 @@ class SwipeActionButton: UIControl {
         contentView = contentViewBuilder(action)
         contentView.isUserInteractionEnabled = false
         contentView.translatesAutoresizingMaskIntoConstraints = false
+        layer.cornerRadius = contentView.layer.cornerRadius
+        layer.cornerCurve = contentView.layer.cornerCurve
         addSubview(contentView)
         NSLayoutConstraint.activate([
             contentView.leadingAnchor.constraint(equalTo: leadingAnchor),

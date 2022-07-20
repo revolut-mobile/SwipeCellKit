@@ -7,7 +7,6 @@
 //
 
 import UIKit
-
 /**
  The `SwipeCollectionViewCell` class extends `UICollectionViewCell` and provides more flexible options for cell swiping behavior.
  
@@ -92,7 +91,7 @@ open class SwipeCollectionViewCell: UICollectionViewCell {
                 contentView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
             ])
         }
-        
+
         swipeController = SwipeController(swipeable: self, actionsContainerView: contentView)
         swipeController.delegate = self
     }

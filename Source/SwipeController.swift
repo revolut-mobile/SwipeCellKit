@@ -66,7 +66,7 @@ class SwipeController: NSObject {
 
     @objc func handlePan(gesture: UIPanGestureRecognizer) {
         guard let target = actionsContainerView, var swipeable = self.swipeable else { return }
-        
+
         let velocity = gesture.velocity(in: target)
         
         if delegate?.swipeController(self, canBeginEditingSwipeableFor: velocity.x > 0 ? .left : .right) == false {
@@ -211,10 +211,11 @@ class SwipeController: NSObject {
         
         swipeable.actionsView?.removeFromSuperview()
         swipeable.actionsView = nil
-        
+
         var contentEdgeInsets = UIEdgeInsets.zero
-        if let visibleTableViewRect = delegate?.swipeController(self, visibleRectFor: scrollView) {
-            
+        if let userEdgeInsets = options.edgeInsets {
+            contentEdgeInsets = userEdgeInsets
+        } else if let visibleTableViewRect = delegate?.swipeController(self, visibleRectFor: scrollView) {
             let frame = (swipeable as Swipeable).frame
             let visibleSwipeableRect = frame.intersection(visibleTableViewRect)
             if visibleSwipeableRect.isNull == false {
@@ -241,9 +242,10 @@ class SwipeController: NSObject {
         actionsView.delegate = self
         
         actionsContainerView.addSubview(actionsView)
+        actionsView.addButtons()
         
         actionsView.heightAnchor.constraint(equalTo: swipeable.heightAnchor).isActive = true
-        actionsView.widthAnchor.constraint(equalTo: swipeable.widthAnchor, multiplier: 2).isActive = true
+        actionsView.widthAnchor.constraint(equalTo: swipeable.widthAnchor).isActive = true
         actionsView.topAnchor.constraint(equalTo: swipeable.topAnchor).isActive = true
         
         if orientation == .left {
@@ -382,7 +384,24 @@ extension SwipeController: UIGestureRecognizerDelegate {
             let view = gestureRecognizer.view,
             let gestureRecognizer = gestureRecognizer as? UIPanGestureRecognizer {
             let translation = gestureRecognizer.translation(in: view)
-            return abs(translation.y) <= abs(translation.x)
+
+            let location = gestureRecognizer.location(in: view)
+            guard let swipeable = swipeable else { return false }
+
+            var leftPanArea: CGFloat = 0
+            let width = swipeable.bounds.width
+            if let leftOptions = delegate?.swipeController(self, editActionsOptionsForSwipeableFor: .left) {
+                leftPanArea = width * leftOptions.leftSwipeAreaMultiplier
+            }
+
+            var rightPanArea: CGFloat = 0
+            if let rightOptions = delegate?.swipeController(self, editActionsOptionsForSwipeableFor: .right) {
+                rightPanArea = width - width * rightOptions.rightSwipeAreaMultiplier
+            }
+
+            let isInPanArea = translation.x < 0 ? location.x > rightPanArea : location.x < leftPanArea
+
+            return abs(translation.y) <= abs(translation.x) && isInPanArea
         }
         
         return true

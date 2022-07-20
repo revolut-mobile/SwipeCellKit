@@ -33,6 +33,8 @@ class RoundedCornersActionContentView: ActionContentView {
     private func buildView() {
         bgView.layer.cornerRadius = 12.0
         bgView.layer.cornerCurve = .continuous
+        layer.cornerRadius = 12.0
+        layer.cornerCurve = .continuous
         addSubview(bgView)
         bgView.translatesAutoresizingMaskIntoConstraints = false
 
@@ -57,8 +59,8 @@ class RoundedCornersActionContentView: ActionContentView {
         NSLayoutConstraint.activate([
             bgView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 2),
             bgView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -2),
-            bgView.topAnchor.constraint(equalTo: topAnchor, constant: 2),
-            bgView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -2),
+            bgView.topAnchor.constraint(equalTo: topAnchor),
+            bgView.bottomAnchor.constraint(equalTo: bottomAnchor),
 
             stack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 8),
             stack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -8),

@@ -44,7 +44,16 @@ public struct SwipeOptions {
     
     /// The amount of space, in points, between the button image and the button title.
     public var buttonSpacing: CGFloat?
-    
+
+    /// Custom edge insets of swipe view if not set will be either .zero or calculated from delegate provided visible rect
+    public var edgeInsets: UIEdgeInsets?
+
+    /// Sets up left swipe zone as fractional of a cell width. 1 - all cell will respond to pan gesture. 0.3 - only left 30% of a cell width will respond.
+    public var leftSwipeAreaMultiplier: CGFloat = 1
+
+    /// Sets up right swipe zone as fractional of a cell width. 1 - all cell will respond to pan gesture. 0.3 - only right 30% of a cell width will respond.
+    public var rightSwipeAreaMultiplier: CGFloat = 1
+
     /// Constructs a new `SwipeOptions` instance with default options.
     public init() {}
 }
