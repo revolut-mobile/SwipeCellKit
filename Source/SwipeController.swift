@@ -410,8 +410,7 @@ extension SwipeController: UIGestureRecognizerDelegate {
     private func getPanZone(_ zone: PanZoneWidth, width: CGFloat) -> CGFloat {
         switch zone {
         case let .fractional(multiplier):
-            let fraction = abs(multiplier - multiplier.rounded(.down))
-            return width * fraction
+            return width * multiplier
         case let .absolute(absoluteValue):
             return absoluteValue
         }
