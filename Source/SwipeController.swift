@@ -388,26 +388,26 @@ extension SwipeController: UIGestureRecognizerDelegate {
             let location = gestureRecognizer.location(in: view)
             guard let swipeable = swipeable else { return false }
 
-            var leftPanArea: CGFloat = 0
+            var leftPanZone: CGFloat = 0
             let width = swipeable.bounds.width
             if let leftOptions = delegate?.swipeController(self, editActionsOptionsForSwipeableFor: .left) {
-                leftPanArea = getPanArea(leftOptions.leftPanZone, width: width)
+                leftPanZone = getPanZone(leftOptions.leftPanZone, width: width)
             }
 
-            var rightPanArea: CGFloat = 0
+            var rightPanZone: CGFloat = 0
             if let rightOptions = delegate?.swipeController(self, editActionsOptionsForSwipeableFor: .right) {
-                rightPanArea = width - getPanArea(rightOptions.rightPanZone, width: width)
+                rightPanZone = width - getPanZone(rightOptions.rightPanZone, width: width)
             }
 
-            let isInPanArea = translation.x < 0 ? location.x >= rightPanArea : location.x <= leftPanArea
+            let isInPanZone = translation.x < 0 ? location.x >= rightPanZone : location.x <= leftPanZone
 
-            return abs(translation.y) <= abs(translation.x) && isInPanArea
+            return abs(translation.y) <= abs(translation.x) && isInPanZone
         }
         
         return true
     }
 
-    private func getPanArea(_ zone: PanZoneWidth, width: CGFloat) -> CGFloat {
+    private func getPanZone(_ zone: PanZoneWidth, width: CGFloat) -> CGFloat {
         switch zone {
         case let .fractional(multiplier):
             let fraction = abs(multiplier - multiplier.rounded(.down))
