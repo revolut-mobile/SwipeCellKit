@@ -174,8 +174,8 @@ extension CustomMailCollectionViewController: SwipeCollectionViewCellDelegate {
         options.backgroundColor = .clear
         options.buttonVerticalAlignment = .center
         options.edgeInsets = .init(top: 2, left: 0, bottom: 2, right: 0)
-        options.rightSwipeAreaMultiplier = 0.3
-        options.leftSwipeAreaMultiplier = 0.2
+        options.rightPanZone = .fractional(0.3)
+        options.leftPanZone = .absolute(100)
         
         return options
     }

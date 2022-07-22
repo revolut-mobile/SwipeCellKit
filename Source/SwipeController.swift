@@ -391,20 +391,30 @@ extension SwipeController: UIGestureRecognizerDelegate {
             var leftPanArea: CGFloat = 0
             let width = swipeable.bounds.width
             if let leftOptions = delegate?.swipeController(self, editActionsOptionsForSwipeableFor: .left) {
-                leftPanArea = width * leftOptions.leftSwipeAreaMultiplier
+                leftPanArea = getPanArea(leftOptions.leftPanZone, width: width)
             }
 
             var rightPanArea: CGFloat = 0
             if let rightOptions = delegate?.swipeController(self, editActionsOptionsForSwipeableFor: .right) {
-                rightPanArea = width - width * rightOptions.rightSwipeAreaMultiplier
+                rightPanArea = width - getPanArea(rightOptions.rightPanZone, width: width)
             }
 
-            let isInPanArea = translation.x < 0 ? location.x > rightPanArea : location.x < leftPanArea
+            let isInPanArea = translation.x < 0 ? location.x >= rightPanArea : location.x <= leftPanArea
 
             return abs(translation.y) <= abs(translation.x) && isInPanArea
         }
         
         return true
+    }
+
+    private func getPanArea(_ zone: PanZoneWidth, width: CGFloat) -> CGFloat {
+        switch zone {
+        case let .fractional(multiplier):
+            let fraction = abs(multiplier - multiplier.rounded(.down))
+            return width * fraction
+        case let .absolute(absoluteValue):
+            return absoluteValue
+        }
     }
 }
 
