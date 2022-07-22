@@ -24,7 +24,7 @@ class CustomMailCollectionViewController: UICollectionViewController, UICollecti
         
         resetData()
     }
-    
+
     // MARK: - Collection view data source
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return emails.count
@@ -173,6 +173,9 @@ extension CustomMailCollectionViewController: SwipeCollectionViewCellDelegate {
 
         options.backgroundColor = .clear
         options.buttonVerticalAlignment = .center
+        options.edgeInsets = .init(top: 2, left: 0, bottom: 2, right: 0)
+        options.rightPanZone = .fractional(0.3)
+        options.leftPanZone = .absolute(100)
         
         return options
     }

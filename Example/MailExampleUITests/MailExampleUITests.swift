@@ -27,7 +27,7 @@ class MailExampleUITests: XCTestCase {
 
         let removed = NSPredicate(format: "exists == 0")
         expectation(for: removed, evaluatedWith: cell, handler: nil)
-        waitForExpectations(timeout: 1, handler: nil)
+        waitForExpectations(timeout: 1.5, handler: nil)
     }
 
     func testActionCustomAccessibilityLabel() {
@@ -45,7 +45,7 @@ class MailExampleUITests: XCTestCase {
 
         let actionsClosed = NSPredicate(format: "exists == 0")
         expectation(for: actionsClosed, evaluatedWith: flagButton, handler: nil)
-        waitForExpectations(timeout: 1, handler: nil)
+        waitForExpectations(timeout: 1.5, handler: nil)
 
     }
 

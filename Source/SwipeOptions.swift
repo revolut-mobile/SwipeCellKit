@@ -44,9 +44,23 @@ public struct SwipeOptions {
     
     /// The amount of space, in points, between the button image and the button title.
     public var buttonSpacing: CGFloat?
-    
+
+    /// Custom edge insets of swipe view if not set will be either .zero or calculated from delegate provided visible rect
+    public var edgeInsets: UIEdgeInsets?
+
+    /// Sets up left swipe zone. There are two options fractional of cell width and absolute value used by pan gesture.
+    public var leftPanZone: PanZoneWidth = .fractional(1)
+
+    /// Sets up right swipe zone. There are two options fractional of cell width and absolute value used by pan gesture.
+    public var rightPanZone: PanZoneWidth = .fractional(1)
+
     /// Constructs a new `SwipeOptions` instance with default options.
     public init() {}
+}
+
+public enum PanZoneWidth {
+    case fractional(_ multiplier: CGFloat)
+    case absolute(_ width: CGFloat)
 }
 
 /// Describes the transition style. Transition is the style of how the action buttons are exposed during the swipe.
