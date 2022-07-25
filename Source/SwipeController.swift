@@ -391,12 +391,20 @@ extension SwipeController: UIGestureRecognizerDelegate {
             var leftPanZone: CGFloat = 0
             let width = swipeable.bounds.width
             if let leftOptions = delegate?.swipeController(self, editActionsOptionsForSwipeableFor: .left) {
-                leftPanZone = getPanZone(leftOptions.leftPanZone, width: width)
+                leftPanZone = getPanZone(
+                    leftOptions.leftPanZone,
+                    width: width,
+                    state: swipeable.state
+                )
             }
 
             var rightPanZone: CGFloat = 0
             if let rightOptions = delegate?.swipeController(self, editActionsOptionsForSwipeableFor: .right) {
-                rightPanZone = width - getPanZone(rightOptions.rightPanZone, width: width)
+                rightPanZone = width - getPanZone(
+                    rightOptions.rightPanZone,
+                    width: width,
+                    state: swipeable.state
+                )
             }
 
             let isInPanZone = translation.x < 0 ? location.x >= rightPanZone : location.x <= leftPanZone
@@ -407,7 +415,12 @@ extension SwipeController: UIGestureRecognizerDelegate {
         return true
     }
 
-    private func getPanZone(_ zone: PanZoneWidth, width: CGFloat) -> CGFloat {
+    private func getPanZone(_ zone: PanZoneWidth, width: CGFloat, state: SwipeState) -> CGFloat {
+        // When actions are shown do not check swipe zone.
+        guard ![SwipeState.right, SwipeState.left].contains(state)  else {
+            return width
+        }
+
         switch zone {
         case let .fractional(multiplier):
             return width * multiplier
