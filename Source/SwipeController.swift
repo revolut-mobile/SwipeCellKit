@@ -417,7 +417,7 @@ extension SwipeController: UIGestureRecognizerDelegate {
 
     private func getPanZone(_ zone: PanZoneWidth, width: CGFloat, state: SwipeState) -> CGFloat {
         // When actions are shown do not check swipe zone.
-        guard ![SwipeState.right, SwipeState.left].contains(state)  else {
+        guard ![SwipeState.right, SwipeState.left].contains(state) else {
             return width
         }
 
