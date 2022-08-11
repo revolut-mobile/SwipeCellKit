@@ -12,6 +12,7 @@
 		290FF0C72823EBC200212EAE /* RoundedCornersActionContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 290FF0C62823EBC200212EAE /* RoundedCornersActionContentView.swift */; };
 		290FF0C92823EC6000212EAE /* UIColor+Highlighted.swift in Sources */ = {isa = PBXBuildFile; fileRef = 290FF0C82823EC6000212EAE /* UIColor+Highlighted.swift */; };
 		291D91482835380B00FCA894 /* MailExampleUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 291D91472835380B00FCA894 /* MailExampleUITests.swift */; };
+		296D458C28A3DA2B0002C5B5 /* ListPagesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296D458B28A3DA2B0002C5B5 /* ListPagesViewController.swift */; };
 		29FC1CF62822AD2A00F48AA8 /* CustomMailCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29FC1CF52822AD2A00F48AA8 /* CustomMailCollectionViewController.swift */; };
 		3F234B0A1E44AC2600E22A38 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F234B041E44AC2600E22A38 /* AppDelegate.swift */; };
 		3F234B0B1E44AC2600E22A38 /* MailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F234B051E44AC2600E22A38 /* MailTableViewController.swift */; };
@@ -54,6 +55,7 @@
 		290FF0C82823EC6000212EAE /* UIColor+Highlighted.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Highlighted.swift"; sourceTree = "<group>"; };
 		291D91452835380B00FCA894 /* MailExampleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MailExampleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		291D91472835380B00FCA894 /* MailExampleUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailExampleUITests.swift; sourceTree = "<group>"; };
+		296D458B28A3DA2B0002C5B5 /* ListPagesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListPagesViewController.swift; sourceTree = "<group>"; };
 		29FC1CF52822AD2A00F48AA8 /* CustomMailCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomMailCollectionViewController.swift; sourceTree = "<group>"; };
 		3F234AE31E44AA5E00E22A38 /* MailExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MailExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F234AF21E44AA5E00E22A38 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -137,6 +139,7 @@
 				3F234B051E44AC2600E22A38 /* MailTableViewController.swift */,
 				B93ECA9C1EDEF1EA00AE05AD /* MailCollectionViewController.swift */,
 				29FC1CF52822AD2A00F48AA8 /* CustomMailCollectionViewController.swift */,
+				296D458B28A3DA2B0002C5B5 /* ListPagesViewController.swift */,
 				290FF0C62823EBC200212EAE /* RoundedCornersActionContentView.swift */,
 				290FF0C82823EC6000212EAE /* UIColor+Highlighted.swift */,
 				B93ECA9E1EDEF56300AE05AD /* Shared.swift */,
@@ -276,6 +279,7 @@
 				290FF0C72823EBC200212EAE /* RoundedCornersActionContentView.swift in Sources */,
 				29FC1CF62822AD2A00F48AA8 /* CustomMailCollectionViewController.swift in Sources */,
 				B93ECA9F1EDEF56300AE05AD /* Shared.swift in Sources */,
+				296D458C28A3DA2B0002C5B5 /* ListPagesViewController.swift in Sources */,
 				3F234B0A1E44AC2600E22A38 /* AppDelegate.swift in Sources */,
 				3F234B0C1E44AC2600E22A38 /* Data.swift in Sources */,
 				290FF0C92823EC6000212EAE /* UIColor+Highlighted.swift in Sources */,

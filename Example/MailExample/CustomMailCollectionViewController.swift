@@ -16,11 +16,25 @@ class CustomMailCollectionViewController: UICollectionViewController, UICollecti
     var buttonDisplayMode: ButtonDisplayMode = .titleAndImage
     var buttonStyle: ButtonStyle = .backgroundColor
     var usesTallCells = false
-    
+    private let isManualMode: Bool
+
+    init() {
+        isManualMode = true
+        super.init(collectionViewLayout: UICollectionViewFlowLayout())
+    }
+
+    required init?(coder: NSCoder) {
+        isManualMode = false
+        super.init(coder: coder)
+    }
+
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
         navigationItem.rightBarButtonItem = editButtonItem
+        if isManualMode {
+            collectionView.register(CustomMailCollectionViewCell.self, forCellWithReuseIdentifier: "MailCell")
+        }
         
         resetData()
     }
@@ -38,6 +52,9 @@ class CustomMailCollectionViewController: UICollectionViewController, UICollecti
         let email = emails[indexPath.row]
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "MailCell", for: indexPath) as! CustomMailCollectionViewCell
+        if isManualMode {
+            cell.setupViews()
+        }
         
         cell.delegate = self
         cell.selectedBackgroundView = UIView()
@@ -232,7 +249,57 @@ class CustomMailCollectionViewCell: SwipeCollectionViewCell {
             indicatorView.transform = unread ? CGAffineTransform.identity : CGAffineTransform.init(scaleX: 0.001, y: 0.001)
         }
     }
-    
+
+    func setupViews() {
+        fromLabel = UILabel()
+        fromLabel.font = .preferredFont(forTextStyle: .headline)
+        fromLabel.textColor = .label
+        dateLabel = UILabel()
+        dateLabel.font = .preferredFont(forTextStyle: .subheadline)
+        dateLabel.textColor = .secondaryLabel
+        subjectLabel = UILabel()
+        subjectLabel.font = .preferredFont(forTextStyle: .subheadline)
+        subjectLabel.textColor = .label
+        bodyLabel = UILabel()
+        bodyLabel.font = .preferredFont(forTextStyle: .subheadline)
+        bodyLabel.textColor = .secondaryLabel
+
+        let hStack = UIStackView(arrangedSubviews: [
+            fromLabel,
+            dateLabel,
+            UIImageView(image: UIImage(named: "Disclosure")!)
+        ])
+        hStack.axis = .horizontal
+        hStack.spacing = 6
+
+        let vStack = UIStackView(arrangedSubviews: [
+            hStack,
+            subjectLabel,
+            bodyLabel
+        ])
+        vStack.axis = .vertical
+        vStack.spacing = 2
+
+        contentView.addSubview(vStack)
+        let separator = UIView()
+        separator.backgroundColor = .separator
+        separator.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(separator)
+
+        vStack.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            vStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
+            vStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24),
+            vStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
+            vStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 4),
+            separator.leadingAnchor.constraint(equalTo: vStack.leadingAnchor),
+            separator.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            separator.heightAnchor.constraint(equalToConstant: 0.5)
+        ])
+
+        setupIndicatorView()
+    }
+
     override func awakeFromNib() {
         setupIndicatorView()
     }
