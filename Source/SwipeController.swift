@@ -360,6 +360,8 @@ class SwipeController: NSObject {
         
         swipeable?.actionsView?.removeFromSuperview()
         swipeable?.actionsView = nil
+
+        actionsContainerView?.mask = nil
     }
     
 }
@@ -582,9 +584,11 @@ extension SwipeController: SwipeActionsViewDelegate {
         
         if animated {
             animate(toOffset: targetCenter) { complete in
+                swipeable.state = targetState
                 completion?(complete)
             }
         } else {
+            swipeable.state = targetState
             actionsContainerView.center.x = targetCenter
             swipeable.actionsView?.visibleWidth = abs(actionsContainerView.frame.minX)
         }
