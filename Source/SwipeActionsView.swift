@@ -158,7 +158,6 @@ class SwipeActionsView: UIView {
     private func addButtons(for actions: [SwipeAction], withMaximum size: CGSize, contentEdgeInsets: UIEdgeInsets) -> [SwipeActionButton] {
         let maximum = options.maximumButtonWidth ?? (size.width - 30) / CGFloat(actions.count)
         let minimum = options.minimumButtonWidth ?? min(maximum, 74)
-        minimumButtonWidth = buttons.reduce(minimum, { initial, next in max(initial, next.preferredWidth(maximum: maximum)) })
 
         let buttons: [SwipeActionButton] = actions.map({ action in
             let actionButton = SwipeActionButton(
@@ -172,6 +171,8 @@ class SwipeActionsView: UIView {
             ]
             return actionButton
         })
+
+        minimumButtonWidth = buttons.reduce(minimum, { initial, next in max(initial, next.preferredWidth(maximum: maximum)) })
 
         buttons.enumerated().forEach { (index, button) in
             let action = actions[index]
