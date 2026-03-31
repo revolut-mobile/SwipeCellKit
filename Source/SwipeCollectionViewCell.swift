@@ -96,6 +96,20 @@ open class SwipeCollectionViewCell: UICollectionViewCell {
         swipeController.delegate = self
     }
     
+    // Preserve contentView's horizontal offset during layout passes (e.g. reconfigureItems).
+    // contentView is pinned to cell edges via Auto Layout, so super.layoutSubviews() resets
+    // contentView.center.x — collapsing an open swipe even though state is still active.
+    /// :nodoc:
+    override open func layoutSubviews() {
+        if state.isActive {
+            let contentCenterX = contentView.center.x
+            super.layoutSubviews()
+            contentView.center.x = contentCenterX
+        } else {
+            super.layoutSubviews()
+        }
+    }
+
     /// :nodoc:
     override open func prepareForReuse() {
         super.prepareForReuse()
