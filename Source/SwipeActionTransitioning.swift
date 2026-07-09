@@ -32,14 +32,17 @@ public struct SwipeActionTransitioningContext {
     
     /// The new visibility percentage between 0.0 and 1.0.
     public let oldPercentVisible: CGFloat
-    
+
+    /// The amount by which the swipe has gone past the total action width, in points. 0 when within bounds.
+    public let overscroll: CGFloat
+
     internal let wrapperView: UIView
-    
-    internal init(actionIdentifier: String?, button: UIView, newPercentVisible: CGFloat, oldPercentVisible: CGFloat, wrapperView: UIView) {
-        self.actionIdentifier = actionIdentifier
+
+    internal init(actionIdentifier: String?, button: UIView, newPercentVisible: CGFloat, oldPercentVisible: CGFloat, overscroll: CGFloat = 0, wrapperView: UIView) {        self.actionIdentifier = actionIdentifier
         self.button = button
         self.newPercentVisible = newPercentVisible
         self.oldPercentVisible = oldPercentVisible
+        self.overscroll = overscroll
         self.wrapperView = wrapperView
     }
     

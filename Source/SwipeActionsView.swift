@@ -276,14 +276,17 @@ class SwipeActionsView: UIView {
         DispatchQueue.main.async {
             guard self.buttons.count == oldWidths.count else { return }
 
+            let overscroll = max(0, self.visibleWidth - self.preferredWidth)
+
             oldWidths.enumerated().forEach { index, oldWidth in
                 let newWidth = newWidths[index]
-                if oldWidth != newWidth {
+                if oldWidth != newWidth || overscroll > 0 {
                     let context = SwipeActionTransitioningContext(
                         actionIdentifier: self.actions[index].identifier,
                         button: self.buttons[index],
                         newPercentVisible: newWidth / self.minimumButtonWidth,
                         oldPercentVisible: oldWidth / self.minimumButtonWidth,
+                        overscroll: overscroll,
                         wrapperView: self.subviews[index])
 
                     self.actions[index].transitionDelegate?.didTransition(with: context)
