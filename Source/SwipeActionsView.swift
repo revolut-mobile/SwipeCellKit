@@ -34,6 +34,8 @@ class SwipeActionsView: UIView {
 
     var buttons: [SwipeActionButton] = []
 
+    private var wasOverscrolling = false
+
     var minimumButtonWidth: CGFloat = 0
     var maximumImageHeight: CGFloat {
         return actions.reduce(0, { initial, next in max(initial, next.image?.size.height ?? 0) })
@@ -274,13 +276,15 @@ class SwipeActionsView: UIView {
 
     func notifyVisibleWidthChanged(oldWidths: [CGFloat], newWidths: [CGFloat]) {
         DispatchQueue.main.async {
-            guard self.buttons.count == oldWidths.count else { return }
-
             let overscroll = max(0, self.visibleWidth - self.preferredWidth)
+            let justStoppedOverscrolling = self.wasOverscrolling && overscroll == 0
+            self.wasOverscrolling = overscroll > 0
+
+            guard self.buttons.count == oldWidths.count else { return }
 
             oldWidths.enumerated().forEach { index, oldWidth in
                 let newWidth = newWidths[index]
-                if oldWidth != newWidth || overscroll > 0 {
+                if oldWidth != newWidth || overscroll > 0 || justStoppedOverscrolling {
                     let context = SwipeActionTransitioningContext(
                         actionIdentifier: self.actions[index].identifier,
                         button: self.buttons[index],
