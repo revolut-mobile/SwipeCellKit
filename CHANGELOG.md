@@ -2,6 +2,21 @@
 
 `SwipeCellKit` adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+#### Added
+
+- Custom transition preparation and interactive transition context state.
+- Configurable release activation thresholds.
+- Equal and individual action-width modes.
+- Fill-available-space expansion layout and expansion-width callbacks for custom action content.
+
+#### Changed
+
+- Transition layouts and expansion calculations now support actions with different widths.
+
+---
+
 ## [2.7.1](https://github.com/jerkoch/SwipeCellKit/releases/tag/2.7.1)
 
 #### Added
