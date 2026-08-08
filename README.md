@@ -23,6 +23,8 @@ A swipeable `UITableViewCell` or `UICollectionViewCell` with support for:
 * Customizable action button behavior during swipe
 * Animated expansion when dragging past threshold
 * Customizable expansion animations
+* Equal or individual action widths
+* Configurable release and expansion thresholds
 * Support for both `UITableView` and `UICollectionView`
 * Accessibility
 * Dark Mode
@@ -211,6 +213,24 @@ See [Customizing Transitions](https://github.com/SwipeCellKit/SwipeCellKit/blob/
 #### Transition Delegate
 
 Transition for a `SwipeAction` can be observered by setting a `SwipeActionTransitioning` on the `transitionDelegate` property. This allows you to observe what percentage is visible and access to the underlying `UIButton` for that `SwipeAction`. 
+
+### Action Widths and Release Threshold
+
+Actions use an equal width by default. They can instead preserve the preferred width reported by each action content view:
+
+```swift
+options.minimumButtonWidth = 64
+options.maximumButtonWidth = 80
+options.buttonWidthMode = .individual
+```
+
+You can also require a minimum drag distance before actions remain open when a gesture starts from the closed position:
+
+```swift
+options.activationThreshold = .fractional(0.25)
+```
+
+This release threshold is independent of the expansion threshold used to commit an expandable action. See the [Advanced Guide](Guides/Advanced.md) for details about widths, transition lifecycle, and fill expansion.
 
 ### Expansion
 

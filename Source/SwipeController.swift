@@ -108,7 +108,10 @@ class SwipeController: NSObject {
                 target.center.x = gesture.elasticTranslation(in: target,
                                                              withLimit: .zero,
                                                              fromOriginalCenter: CGPoint(x: originalCenter, y: 0)).x
-                swipeable.actionsView?.visibleWidth = abs((swipeable as Swipeable).frame.minX)
+                swipeable.actionsView?.updateVisibleWidth(
+                    abs((swipeable as Swipeable).frame.minX),
+                    isInteractive: true
+                )
                 scrollRatio = elasticScrollRatio
                 return
             }
@@ -134,7 +137,10 @@ class SwipeController: NSObject {
                                                                  withLimit: CGSize(width: targetOffset, height: 0),
                                                                  fromOriginalCenter: CGPoint(x: originalCenter, y: 0),
                                                                  applyingRatio: expansionStyle.targetOverscrollElasticity).x
-                    swipeable.actionsView?.visibleWidth = abs(actionsContainerView.frame.minX)
+                    swipeable.actionsView?.updateVisibleWidth(
+                        abs(actionsContainerView.frame.minX),
+                        isInteractive: true
+                    )
 
                     if currentOffset/targetOffset > 1.0,
                         let wrapper = actionsView.buttons.last?.superview as? SwipeActionButtonWrapperView {
@@ -148,7 +154,10 @@ class SwipeController: NSObject {
                                                              withLimit: CGSize(width: actionsView.preferredWidth, height: 0),
                                                              fromOriginalCenter: CGPoint(x: originalCenter, y: 0),
                                                              applyingRatio: elasticScrollRatio).x
-                swipeable.actionsView?.visibleWidth = abs(actionsContainerView.frame.minX)
+                swipeable.actionsView?.updateVisibleWidth(
+                    abs(actionsContainerView.frame.minX),
+                    isInteractive: true
+                )
                 
                 if (target.center.x - originalCenter) / translation != 1.0 {
                     scrollRatio = elasticScrollRatio
@@ -288,7 +297,7 @@ class SwipeController: NSObject {
             guard let swipeable = self.swipeable, let actionsContainerView = self.actionsContainerView else { return }
             
             actionsContainerView.center = CGPoint(x: offset, y: actionsContainerView.center.y)
-            swipeable.actionsView?.visibleWidth = abs(actionsContainerView.frame.minX)
+            swipeable.actionsView?.updateVisibleWidth(abs(actionsContainerView.frame.minX))
             swipeable.layoutIfNeeded()
         })
         
@@ -311,7 +320,7 @@ class SwipeController: NSObject {
         if swipeable.state == .left || swipeable.state == .right {
             let targetOffset = targetCenter(active: swipeable.state.isActive)
             actionsContainerView.center = CGPoint(x: targetOffset, y: actionsContainerView.center.y)
-            swipeable.actionsView?.visibleWidth = abs(actionsContainerView.frame.minX)
+            swipeable.actionsView?.updateVisibleWidth(abs(actionsContainerView.frame.minX))
             swipeable.layoutIfNeeded()
         }        
     }
@@ -333,14 +342,33 @@ class SwipeController: NSObject {
     }
     
     func targetState(forVelocity velocity: CGPoint) -> SwipeState {
-        guard let actionsView = swipeable?.actionsView else { return .center }
-        
-        switch actionsView.orientation {
-        case .left:
-            return (velocity.x < 0 && !actionsView.expanded) ? .center : .left
-        case .right:
-            return (velocity.x > 0 && !actionsView.expanded) ? .center : .right
+        guard let swipeable = swipeable, let actionsView = swipeable.actionsView else { return .center }
+
+        if actionsView.expanded {
+            return SwipeState(orientation: actionsView.orientation)
         }
+
+        if swipeable.state == .dragging, let activationThreshold = actionsView.options.activationThreshold {
+            let thresholdValue = getActivationThreshold(
+                activationThreshold,
+                width: actionsView.bounds.width
+            )
+
+            return actionsView.revealedWidth >= thresholdValue
+                ? SwipeState(orientation: actionsView.orientation)
+                : .center
+        }
+
+        let isClosing: Bool = switch actionsView.orientation {
+        case .left:
+            velocity.x < 0
+        case .right:
+            velocity.x > 0
+        }
+
+        return isClosing
+            ? .center
+            : SwipeState(orientation: actionsView.orientation)
     }
     
     func targetCenter(active: Bool) -> CGFloat {
@@ -417,6 +445,15 @@ extension SwipeController: UIGestureRecognizerDelegate {
         return true
     }
 
+    private func getActivationThreshold(_ threshold: SwipeActionsActivationThreshold, width: CGFloat) -> CGFloat {
+        switch threshold {
+        case let .fractional(multiplier):
+            return width * multiplier
+        case let .absolute(absoluteValue):
+            return absoluteValue
+        }
+    }
+
     private func getPanZone(_ zone: PanZoneWidth, width: CGFloat, state: SwipeState) -> CGFloat {
         // When actions are shown do not check swipe zone.
         guard ![SwipeState.right, SwipeState.left].contains(state) else {
@@ -469,7 +506,7 @@ extension SwipeController: SwipeActionsViewDelegate {
         guard let swipeable = self.swipeable, let actionsContainerView = self.actionsContainerView else { return }
         guard let actionsView = swipeable.actionsView, let indexPath = swipeable.indexPath else { return }
 
-        let newCenter = swipeable.bounds.midX - (swipeable.bounds.width + actionsView.minimumButtonWidth) * actionsView.orientation.scale
+        let newCenter = swipeable.bounds.midX - (swipeable.bounds.width + actionsView.expandableButtonWidth) * actionsView.orientation.scale
         
         action.completionHandler = { [weak self] style in
             guard let `self` = self else { return }
@@ -488,7 +525,7 @@ extension SwipeController: SwipeActionsViewDelegate {
                     
                     actionsContainerView.center.x = newCenter
                     actionsContainerView.mask?.frame.size.height = 0
-                    swipeable.actionsView?.visibleWidth = abs(actionsContainerView.frame.minX)
+                    swipeable.actionsView?.updateVisibleWidth(abs(actionsContainerView.frame.minX))
                     
                     if fillOption.timing == .after {
                         actionsView.alpha = 0
@@ -538,7 +575,7 @@ extension SwipeController: SwipeActionsViewDelegate {
             }
         } else {
             actionsContainerView.center = CGPoint(x: targetCenter, y: actionsContainerView.center.y)
-            swipeable.actionsView?.visibleWidth = abs(actionsContainerView.frame.minX)
+            swipeable.actionsView?.updateVisibleWidth(abs(actionsContainerView.frame.minX))
             reset()
         }
         
@@ -551,7 +588,7 @@ extension SwipeController: SwipeActionsViewDelegate {
         let targetCenter = self.targetCenter(active: false)
         
         actionsContainerView.center = CGPoint(x: targetCenter, y: actionsContainerView.center.y)
-        swipeable.actionsView?.visibleWidth = abs(actionsContainerView.frame.minX)
+        swipeable.actionsView?.updateVisibleWidth(abs(actionsContainerView.frame.minX))
     }
     
     func showSwipe(orientation: SwipeActionsOrientation, animated: Bool = true, completion: ((Bool) -> Void)? = nil) {
@@ -590,7 +627,7 @@ extension SwipeController: SwipeActionsViewDelegate {
         } else {
             swipeable.state = targetState
             actionsContainerView.center.x = targetCenter
-            swipeable.actionsView?.visibleWidth = abs(actionsContainerView.frame.minX)
+            swipeable.actionsView?.updateVisibleWidth(abs(actionsContainerView.frame.minX))
         }
     }
 }

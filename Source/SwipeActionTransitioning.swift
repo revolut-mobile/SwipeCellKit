@@ -12,9 +12,21 @@ import UIKit
  */
 public protocol SwipeActionTransitioning {
     /**
+     Gives the delegate an opportunity to configure the action before it becomes visible.
+
+     The supplied context has both visibility percentages set to zero. This method is
+     invoked synchronously during the action button's first valid layout.
+     */
+    func prepareTransition(with context: SwipeActionTransitioningContext)
+
+    /**
      Tells the delegate that transition change has occured.
      */
     func didTransition(with context: SwipeActionTransitioningContext) -> Void
+}
+
+public extension SwipeActionTransitioning {
+    func prepareTransition(with context: SwipeActionTransitioningContext) {}
 }
 
 /**
@@ -27,19 +39,30 @@ public struct SwipeActionTransitioningContext {
     /// The button that is changing.
     public let button: UIView
     
-    /// The old visibility percentage between 0.0 and 1.0.
+    /// The new visibility percentage between 0.0 and 1.0.
     public let newPercentVisible: CGFloat
     
-    /// The new visibility percentage between 0.0 and 1.0.
+    /// The old visibility percentage between 0.0 and 1.0.
     public let oldPercentVisible: CGFloat
-    
+
+    /// Whether the visibility change is driven directly by an active gesture.
+    public let isInteractive: Bool
+
     internal let wrapperView: UIView
     
-    internal init(actionIdentifier: String?, button: UIView, newPercentVisible: CGFloat, oldPercentVisible: CGFloat, wrapperView: UIView) {
+    internal init(
+        actionIdentifier: String?,
+        button: UIView,
+        newPercentVisible: CGFloat,
+        oldPercentVisible: CGFloat,
+        isInteractive: Bool = false,
+        wrapperView: UIView
+    ) {
         self.actionIdentifier = actionIdentifier
         self.button = button
         self.newPercentVisible = newPercentVisible
         self.oldPercentVisible = oldPercentVisible
+        self.isInteractive = isInteractive
         self.wrapperView = wrapperView
     }
     

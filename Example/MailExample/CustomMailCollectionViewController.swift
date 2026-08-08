@@ -14,17 +14,19 @@ class CustomMailCollectionViewController: UICollectionViewController, UICollecti
     var defaultOptions = SwipeOptions()
     var isSwipeRightEnabled = true
     var buttonDisplayMode: ButtonDisplayMode = .titleAndImage
-    var buttonStyle: ButtonStyle = .backgroundColor
+    var buttonStyle: ButtonStyle = .circular
     var usesTallCells = false
     private let isManualMode: Bool
 
     init() {
         isManualMode = true
+        defaultOptions.transitionStyle = .reveal
         super.init(collectionViewLayout: UICollectionViewFlowLayout())
     }
 
     required init?(coder: NSCoder) {
         isManualMode = false
+        defaultOptions.transitionStyle = .reveal
         super.init(coder: coder)
     }
 
@@ -135,6 +137,7 @@ extension CustomMailCollectionViewController: SwipeCollectionViewCellDelegate {
     
     func collectionView(_ collectionView: UICollectionView, editActionsForItemAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
         let email = emails[indexPath.row]
+        let actionDisplayMode = displayModeForActions(in: collectionView, at: indexPath)
         
         if orientation == .left {
             guard isSwipeRightEnabled else { return nil }
@@ -151,19 +154,19 @@ extension CustomMailCollectionViewController: SwipeCollectionViewCellDelegate {
             read.accessibilityLabel = email.unread ? "Mark as Read" : "Mark as Unread"
             
             let descriptor: ActionDescriptor = email.unread ? .read : .unread
-            configure(action: read, with: descriptor)
+            configure(action: read, with: descriptor, displayMode: actionDisplayMode)
             
             return [read]
         } else {
             let flag = SwipeAction(style: .default, title: nil, handler: nil)
             flag.hidesWhenSelected = true
             flag.accessibilityLabel = "Accessible Button"
-            configure(action: flag, with: .flag)
+            configure(action: flag, with: .flag, displayMode: actionDisplayMode)
             
             let delete = SwipeAction(style: .destructive, title: nil) { action, indexPath in
                 self.emails.remove(at: indexPath.row)
             }
-            configure(action: delete, with: .trash)
+            configure(action: delete, with: .trash, displayMode: actionDisplayMode)
             
             let cell = collectionView.cellForItem(at: indexPath) as! CustomMailCollectionViewCell
             let closure: (UIAlertAction) -> Void = { _ in cell.hideSwipe(animated: true) }
@@ -177,7 +180,7 @@ extension CustomMailCollectionViewController: SwipeCollectionViewCellDelegate {
                 controller.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: closure))
                 self.present(controller, animated: true, completion: nil)
             }
-            configure(action: more, with: .more)
+            configure(action: more, with: .more, displayMode: actionDisplayMode)
             
             return [delete, flag, more]
         }
@@ -185,14 +188,24 @@ extension CustomMailCollectionViewController: SwipeCollectionViewCellDelegate {
     
     func collectionView(_ collectionView: UICollectionView, editActionsOptionsForItemAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> SwipeOptions {
         var options = SwipeOptions()
-        options.expansionStyle = orientation == .left ? .selection : .destructive
+        var expansionStyle: SwipeExpansionStyle = orientation == .left ? .selection : .destructive
+        expansionStyle.expandedActionLayout = .fillAvailableSpace
+        options.expansionStyle = expansionStyle
+        options.expansionDelegate = SecondaryActionsExpansion()
         options.transitionStyle = defaultOptions.transitionStyle
+        options.activationThreshold = .absolute(24)
 
         options.backgroundColor = .clear
+        options.buttonWidthMode = .individual
         options.buttonVerticalAlignment = .center
         options.edgeInsets = .init(top: 2, left: 0, bottom: 2, right: 0)
         options.rightPanZone = .fractional(0.3)
         options.leftPanZone = .absolute(100)
+
+        if buttonStyle == .circular {
+            options.minimumButtonWidth = 20
+            options.maximumButtonWidth = 90
+        }
         
         return options
     }
@@ -217,11 +230,26 @@ extension CustomMailCollectionViewController: SwipeCollectionViewCellDelegate {
             return CGRect(x: bounds.origin.x, y: bounds.origin.y + topInset, width: bounds.width, height: bounds.height - bottomInset)
         }
     }
-    
-    func configure(action: SwipeAction, with descriptor: ActionDescriptor) {
-        action.title = descriptor.title(forDisplayMode: buttonDisplayMode)
-        action.image = descriptor.image(forStyle: buttonStyle, displayMode: buttonDisplayMode)
-        
+
+    private func displayModeForActions(
+        in collectionView: UICollectionView,
+        at indexPath: IndexPath
+    ) -> ButtonDisplayMode {
+        guard let cellHeight = collectionView.layoutAttributesForItem(at: indexPath)?.bounds.height else {
+            return buttonDisplayMode
+        }
+
+        return cellHeight < 120 ? .titleOnly : buttonDisplayMode
+    }
+
+    func configure(
+        action: SwipeAction,
+        with descriptor: ActionDescriptor,
+        displayMode: ButtonDisplayMode
+    ) {
+        action.title = descriptor.title(forDisplayMode: displayMode)
+        action.image = descriptor.image(forStyle: .backgroundColor, displayMode: displayMode)
+
         switch buttonStyle {
         case .backgroundColor:
             action.backgroundColor = descriptor.color(forStyle: buttonStyle)
@@ -229,7 +257,34 @@ extension CustomMailCollectionViewController: SwipeCollectionViewCellDelegate {
             action.backgroundColor = .clear
             action.textColor = descriptor.color(forStyle: buttonStyle)
             action.font = .systemFont(ofSize: 13)
-            action.transitionDelegate = ScaleTransition.default
+            action.transitionDelegate = SpringRevealActionTransition()
+        }
+    }
+}
+
+private struct SecondaryActionsExpansion: SwipeExpanding {
+    func animationTimingParameters(
+        buttons: [UIView],
+        expanding: Bool
+    ) -> SwipeExpansionAnimationTimingParameters {
+        SwipeExpansionAnimationTimingParameters(duration: 0.15)
+    }
+
+    func actionButton(
+        _ button: UIView,
+        didChange expanding: Bool,
+        otherActionButtons: [UIView]
+    ) {
+        otherActionButtons.forEach { button in
+            UIView.animate(
+                withDuration: 0.15,
+                delay: 0,
+                options: [.beginFromCurrentState, .allowUserInteraction],
+                animations: {
+                    button.alpha = expanding ? 0.5 : 1
+                },
+                completion: nil
+            )
         }
     }
 }

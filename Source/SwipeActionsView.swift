@@ -33,8 +33,24 @@ class SwipeActionsView: UIView {
     let contentEdgeInsets: UIEdgeInsets
 
     var buttons: [SwipeActionButton] = []
+    var buttonWidths: [CGFloat] = []
 
-    var minimumButtonWidth: CGFloat = 0
+    private var hasPreparedTransitions = false
+    private var wasInteractive = false
+    private var visibilityUpdateSequence = 0
+
+    var expandableButtonWidth: CGFloat {
+        buttonWidths.last ?? 0
+    }
+
+    var regularActionsWidth: CGFloat {
+        buttonWidths.reduce(0, +)
+    }
+
+    var preferredWidth: CGFloat {
+        return regularActionsWidth + safeAreaMargin
+    }
+
     var maximumImageHeight: CGFloat {
         return actions.reduce(0, { initial, next in max(initial, next.image?.size.height ?? 0) })
     }
@@ -45,27 +61,45 @@ class SwipeActionsView: UIView {
         return orientation == .left ? scrollView.safeAreaInsets.left : scrollView.safeAreaInsets.right
     }
 
-    var visibleWidth: CGFloat = 0 {
-        didSet {
-            // If necessary, adjust for safe areas
-            visibleWidth = max(0, visibleWidth - safeAreaMargin)
+    private(set) var visibleWidth: CGFloat = 0
+    private(set) var revealedWidth: CGFloat = 0
 
-            let preLayoutVisibleWidths = transitionLayout.visibleWidthsForViews(with: layoutContext)
+    func updateVisibleWidth(_ width: CGFloat, isInteractive: Bool = false) {
+        visibilityUpdateSequence += 1
 
-            layoutContext = ActionsViewLayoutContext.newContext(for: self)
+        let preLayoutVisibleWidths = transitionLayout.visibleWidthsForViews(with: layoutContext)
+        let interactionDidChange = wasInteractive != isInteractive
 
-            transitionLayout.container(view: self, didChangeVisibleWidthWithContext: layoutContext)
+        wasInteractive = isInteractive
+        revealedWidth = max(0, width)
+        visibleWidth = max(0, revealedWidth - safeAreaMargin) // If necessary, adjust for safe areas.
+        layoutContext = transitionLayoutContext()
+        transitionLayout.container(view: self, didChangeVisibleWidthWithContext: layoutContext)
 
-            setNeedsLayout()
-            layoutIfNeeded()
+        setNeedsLayout()
+        layoutIfNeeded()
 
-            notifyVisibleWidthChanged(oldWidths: preLayoutVisibleWidths,
-                                      newWidths: transitionLayout.visibleWidthsForViews(with: layoutContext))
-        }
+        notifyVisibleWidthChanged(
+            oldWidths: preLayoutVisibleWidths,
+            newWidths: transitionLayout.visibleWidthsForViews(with: layoutContext),
+            isInteractive: isInteractive,
+            interactionDidChange: interactionDidChange,
+            updateSequence: visibilityUpdateSequence
+        )
     }
 
-    var preferredWidth: CGFloat {
-        return minimumButtonWidth * CGFloat(actions.count) + safeAreaMargin
+    private func transitionLayoutContext() -> ActionsViewLayoutContext {
+        guard options.expansionStyle?.expandedActionLayout == .fillAvailableSpace,
+              visibleWidth > regularActionsWidth else {
+            return ActionsViewLayoutContext.newContext(for: self)
+        }
+
+        return ActionsViewLayoutContext(
+            buttonWidths: buttonWidths,
+            orientation: orientation,
+            contentSize: CGSize(width: regularActionsWidth, height: contentSize.height),
+            visibleWidth: regularActionsWidth
+        )
     }
 
     var contentSize: CGSize {
@@ -113,7 +147,10 @@ class SwipeActionsView: UIView {
             transitionLayout = DragTransitionLayout()
         }
 
-        self.layoutContext = ActionsViewLayoutContext(numberOfActions: actions.count, orientation: orientation)
+        self.layoutContext = ActionsViewLayoutContext(
+            buttonWidths: Array(repeating: 0, count: actions.count),
+            orientation: orientation
+        )
 
         feedbackGenerator = SwipeFeedback(style: .light)
         feedbackGenerator.prepare()
@@ -172,7 +209,20 @@ class SwipeActionsView: UIView {
             return actionButton
         })
 
-        minimumButtonWidth = buttons.reduce(minimum, { initial, next in max(initial, next.preferredWidth(maximum: maximum)) })
+        switch options.buttonWidthMode {
+        case .equal:
+            let sharedWidth = buttons.reduce(minimum) { initial, next in
+                max(initial, next.preferredWidth(maximum: maximum))
+            }
+
+            buttonWidths = buttons.map { _ in sharedWidth }
+        case .individual:
+            buttonWidths = buttons.map { button in
+                let preferredWidth = max(0, button.preferredWidth(maximum: maximum))
+                let width = max(max(0, minimum), preferredWidth)
+                return maximum > 0 ? min(maximum, width) : width
+            }
+        }
 
         buttons.enumerated().forEach { (index, button) in
             let action = actions[index]
@@ -180,7 +230,7 @@ class SwipeActionsView: UIView {
                 frame: .zero,
                 action: action,
                 orientation: orientation,
-                contentWidth: minimumButtonWidth,
+                contentWidth: buttonWidths[index],
                 options: options
             )
             wrapperView.layer.cornerRadius = button.layer.cornerRadius
@@ -272,24 +322,49 @@ class SwipeActionsView: UIView {
         notifyExpansion(expanded: expanded)
     }
 
-    func notifyVisibleWidthChanged(oldWidths: [CGFloat], newWidths: [CGFloat]) {
-        DispatchQueue.main.async {
-            guard self.buttons.count == oldWidths.count else { return }
+    func notifyVisibleWidthChanged(
+        oldWidths: [CGFloat],
+        newWidths: [CGFloat],
+        isInteractive: Bool,
+        interactionDidChange: Bool,
+        updateSequence: Int
+    ) {
+        let notify = { [weak self] in
+            guard let self = self,
+                  self.visibilityUpdateSequence == updateSequence,
+                  self.buttons.count == oldWidths.count,
+                  oldWidths.count == newWidths.count else {
+                return
+            }
 
             oldWidths.enumerated().forEach { index, oldWidth in
                 let newWidth = newWidths[index]
-                if oldWidth != newWidth {
+                if oldWidth != newWidth || interactionDidChange {
+                    let buttonWidth = self.buttonWidths[index]
                     let context = SwipeActionTransitioningContext(
                         actionIdentifier: self.actions[index].identifier,
                         button: self.buttons[index],
-                        newPercentVisible: newWidth / self.minimumButtonWidth,
-                        oldPercentVisible: oldWidth / self.minimumButtonWidth,
-                        wrapperView: self.subviews[index])
+                        newPercentVisible: self.percentVisible(newWidth, buttonWidth: buttonWidth),
+                        oldPercentVisible: self.percentVisible(oldWidth, buttonWidth: buttonWidth),
+                        isInteractive: isInteractive,
+                        wrapperView: self.subviews[index]
+                    )
 
                     self.actions[index].transitionDelegate?.didTransition(with: context)
                 }
             }
         }
+
+        if isInteractive {
+            notify()
+        } else {
+            DispatchQueue.main.async(execute: notify)
+        }
+    }
+
+    private func percentVisible(_ visibleWidth: CGFloat, buttonWidth: CGFloat) -> CGFloat {
+        guard buttonWidth > 0 else { return 0 }
+        return min(max(visibleWidth / buttonWidth, 0), 1)
     }
 
     func notifyExpansion(expanded: Bool) {
@@ -315,16 +390,89 @@ class SwipeActionsView: UIView {
             transitionLayout.layout(view: subview.element, atIndex: subview.offset, with: layoutContext)
         }
 
-        if expanded {
-            subviews.last?.frame.origin.x = 0 + bounds.origin.x
+        prepareTransitionsIfNeeded()
+        layoutExpansion()
+    }
+
+    private func layoutExpansion() {
+        guard let expansionStyle = options.expansionStyle else { return }
+
+        switch expansionStyle.expandedActionLayout {
+        case .edgeAligned:
+            if expanded {
+                subviews.last?.frame.origin.x = bounds.origin.x
+            }
+        case .fillAvailableSpace:
+            layoutFillAvailableSpaceAction()
+        }
+
+    }
+
+    private func layoutFillAvailableSpaceAction() {
+        guard let expandedButton = buttons.last,
+              let wrapperView = expandedButton.superview as? SwipeActionButtonWrapperView else {
+            return
+        }
+
+        let regularButtonWidth = expandableButtonWidth
+        let precedingActionsWidth = buttonWidths.dropLast().reduce(0, +)
+        let maximumWidth = max(regularButtonWidth, bounds.width - precedingActionsWidth)
+        let expandedWidth = min(
+            max(regularButtonWidth, visibleWidth - precedingActionsWidth),
+            maximumWidth
+        )
+        let contentRect = wrapperView.contentRect(forWidth: expandedWidth)
+
+        // The action button may have a spring scale transform applied. A view's
+        // frame is undefined while its transform is non-identity, so resizing it
+        // through frame can corrupt its bounds and center during a fast swipe.
+        expandedButton.bounds = CGRect(origin: .zero, size: contentRect.size)
+        expandedButton.center = CGPoint(x: contentRect.midX, y: contentRect.midY)
+        expandedButton.layoutIfNeeded()
+        expandedButton.updateExpansion(
+            SwipeActionExpansionContext(
+                regularWidth: regularButtonWidth,
+                currentWidth: expandedWidth,
+                maximumWidth: maximumWidth
+            )
+        )
+        expandedButton.layoutIfNeeded()
+    }
+
+    private func prepareTransitionsIfNeeded() {
+        guard !hasPreparedTransitions,
+              bounds.width > 0,
+              bounds.height > 0,
+              buttons.count == actions.count,
+              subviews.count == actions.count else {
+            return
+        }
+
+        hasPreparedTransitions = true
+
+        actions.indices.forEach { index in
+            actions[index].transitionDelegate?.prepareTransition(
+                with: SwipeActionTransitioningContext(
+                    actionIdentifier: actions[index].identifier,
+                    button: buttons[index],
+                    newPercentVisible: 0,
+                    oldPercentVisible: 0,
+                    wrapperView: subviews[index]
+                )
+            )
         }
     }
 }
 
 class SwipeActionButtonWrapperView: UIView {
-    let contentRect: CGRect
+    private let orientation: SwipeActionsOrientation
+    private let contentWidth: CGFloat
     var actionBackgroundColor: UIColor?
     private let cleanBackgroundToClear: Bool
+
+    var contentRect: CGRect {
+        contentRect(forWidth: contentWidth)
+    }
 
     init(
         frame: CGRect,
@@ -333,13 +481,8 @@ class SwipeActionButtonWrapperView: UIView {
         contentWidth: CGFloat,
         options: SwipeOptions
     ) {
-        switch orientation {
-        case .left:
-            contentRect = CGRect(x: frame.width - contentWidth, y: 0, width: contentWidth, height: frame.height)
-        case .right:
-            contentRect = CGRect(x: 0, y: 0, width: contentWidth, height: frame.height)
-        }
-
+        self.orientation = orientation
+        self.contentWidth = contentWidth
         cleanBackgroundToClear = options.backgroundColor == .clear
         super.init(frame: frame)
 
@@ -349,6 +492,18 @@ class SwipeActionButtonWrapperView: UIView {
         } else {
             backgroundColor = actionBackgroundColor
         }
+    }
+
+    func contentRect(forWidth width: CGFloat) -> CGRect {
+        let width = max(width, 0)
+        let originX: CGFloat = switch orientation {
+        case .left:
+            bounds.width - width
+        case .right:
+            0
+        }
+
+        return CGRect(x: originX, y: 0, width: width, height: bounds.height)
     }
 
     func cleanBackground() {

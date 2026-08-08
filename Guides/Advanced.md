@@ -15,6 +15,47 @@ The `ScaleTransition` type provides a static `default` configuration, but it can
 
 You can also easily provide your own completely custom transition behavior by adopting the `SwipeActionTransitioning` protocol. The supplied `SwipeActionTransitioningContext` to the delegate methods reflect the current swipe state as the gesture is performed.
 
+`prepareTransition(with:)` is called once after the action has a valid layout and before transition updates begin. Use it to establish the action's initial visual state, such as a zero scale or transparent appearance.
+
+`didTransition(with:)` is called as the action's visible percentage changes. The transition context provides both the previous and new visible percentages for that action. `isInteractive` is `true` while the gesture is being driven by the user's finger. A callback with `isInteractive == false` announces the final settling target; it is not called for every presentation frame of UIKit's settling animation. Custom transitions can scrub directly during interaction and start their own animation toward the supplied target during settling.
+
+## Customizing Action Widths
+
+The minimum and maximum action widths are configured through `SwipeOptions`:
+
+```swift
+options.minimumButtonWidth = 64
+options.maximumButtonWidth = 80
+```
+
+By default, all actions use the same width. The preferred widths of every action are measured and the widest result is shared:
+
+```swift
+options.buttonWidthMode = .equal
+```
+
+Set the mode to `.individual` when every action should use its own preferred width:
+
+```swift
+options.buttonWidthMode = .individual
+```
+
+In individual mode, SwipeCellKit asks each action's `ActionContentView` for `preferredWidth(maximum:)` and clamps each result to `minimumButtonWidth...maximumButtonWidth`. Reveal layouts, expansion, and gesture calculations use the sum of the resulting widths. Equal mode retains the framework's original shared-width resolution for backward compatibility.
+
+## Customizing the Release Threshold
+
+`activationThreshold` controls how far a gesture that starts with closed actions must travel before the actions open:
+
+```swift
+options.activationThreshold = .fractional(0.25)
+// or
+options.activationThreshold = .absolute(80)
+```
+
+A fractional threshold is relative to the cell width; an absolute threshold is measured in points. When this property is `nil`, SwipeCellKit preserves its default velocity-based opening behavior. Closing gestures always retain the default velocity-based behavior.
+
+This is separate from an expansion style's target and triggers: `activationThreshold` decides whether the actions open, while expansion configuration decides whether an expandable action commits.
+
 ## Customizing Expansion
 
 Expansion behavior is defined by the properties available in the `SwipeExpansionStyle` type: 
@@ -25,6 +66,21 @@ Expansion behavior is defined by the properties available in the `SwipeExpansion
 * `completionAnimation`: Specifies the expansion animation completion style.
 * `minimumTargetOverscroll`: Specifies the minimum amount of overscroll required if the configured target is less than the fully exposed action view.
 * `targetOverscrollElasticity`: The amount of elasticity applied when dragging past the expansion target.
+* `expandedActionLayout`: How the expanded action is positioned and sized.
+
+### Expanded Action Layout
+
+The default `.edgeAligned` layout preserves SwipeCellKit's original behavior. The expanded action keeps its regular width and moves toward the cell edge.
+
+Use `.fillAvailableSpace` to keep the primary action attached to the other actions and stretch it across the remaining revealed width:
+
+```swift
+var expansionStyle = SwipeExpansionStyle.destructive
+expansionStyle.expandedActionLayout = .fillAvailableSpace
+options.expansionStyle = expansionStyle
+```
+
+The action begins stretching after all actions have reached their regular widths. Use a custom `SwipeExpanding` implementation through `SwipeOptions.expansionDelegate` when the remaining actions should change alpha, scale, or another appearance property while expansion is armed.
 
 ### Target
 
@@ -117,6 +173,8 @@ options.expansionDelegate = ScaleAndAlphaExpansion.default
 The `ScaleAndAlphaExpansion` type provides a static `default` configuration, but it can also be instantiated with custom parameters to suit your needs.
 
 You can also provide your own completely custom expansion behavior by adopting the `SwipeExpanding` protocol. The protocol allows you to customize the animation timing parameters prior to initiating the (un)expansion animation, as well as customizing the action during (un)expansion.
+
+Custom action content can react to fill expansion by overriding `ActionContentView.didChangeExpansion(_:)`. The supplied `SwipeActionExpansionContext` contains the action's regular, current, and maximum widths, as well as the additional width beyond its regular size. This is useful when a fixed circular icon should gradually stretch into a pill only after the action itself begins expanding.
 
 ## Vertically Centered Swipe Actions for Tall Cells
 

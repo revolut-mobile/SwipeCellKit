@@ -50,4 +50,8 @@ class SwipeActionButton: UIControl {
     func preferredWidth(maximum: CGFloat) -> CGFloat {
         contentView.preferredWidth(maximum: maximum)
     }
+
+    func updateExpansion(_ context: SwipeActionExpansionContext) {
+        contentView.didChangeExpansion(context)
+    }
 }

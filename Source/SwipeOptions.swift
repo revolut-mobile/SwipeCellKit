@@ -35,6 +35,14 @@ public struct SwipeOptions {
     ///
     /// - note: By default, the system chooses an appropriate size.
     public var minimumButtonWidth: CGFloat?
+
+    /// Determines whether actions share one width or use their content's
+    /// individual preferred widths.
+    ///
+    /// The default `.equal` mode preserves the original shared-width behavior.
+    /// The `.individual` mode clamps each preferred width to
+    /// `minimumButtonWidth...maximumButtonWidth`.
+    public var buttonWidthMode: SwipeButtonWidthMode = .equal
     
     /// The vertical alignment mode used for when a button image and title are present.
     public var buttonVerticalAlignment: SwipeVerticalAlignment = .centerFirstBaseline
@@ -54,8 +62,33 @@ public struct SwipeOptions {
     /// Sets up right swipe zone. There are two options fractional of cell width and absolute value used by pan gesture.
     public var rightPanZone: PanZoneWidth = .fractional(1)
 
+    /// The distance from the closed position the cell must be swiped before its actions remain visible after release.
+    /// When unset, the release velocity direction determines whether the actions open.
+    public var activationThreshold: SwipeActionsActivationThreshold?
+
     /// Constructs a new `SwipeOptions` instance with default options.
     public init() {}
+}
+
+/// Defines how far a cell must be dragged before its actions remain open when
+/// the gesture ends.
+public enum SwipeActionsActivationThreshold {
+    /// Requires the cell to expose the supplied fraction of its width.
+    ///
+    /// Values from `0...1` represent zero to the full cell width.
+    case fractional(CGFloat)
+
+    /// Requires the cell to expose the supplied number of points.
+    case absolute(CGFloat)
+}
+
+/// Describes how regular action button widths are resolved.
+public enum SwipeButtonWidthMode {
+    /// Every action uses the width required by the widest action.
+    case equal
+
+    /// Every action uses its own content's preferred width.
+    case individual
 }
 
 public enum PanZoneWidth {

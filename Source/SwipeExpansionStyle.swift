@@ -53,6 +53,9 @@ public struct SwipeExpansionStyle {
     
     /// Specifies the expansion animation completion style.
     public let completionAnimation: CompletionAnimation
+
+    /// Controls how the primary action is laid out while expansion is revealed.
+    public var expandedActionLayout: ExpandedActionLayout
     
     /// Specifies the minimum amount of overscroll required if the configured target is less than the fully exposed action view.
     public var minimumTargetOverscroll: CGFloat = 20
@@ -65,23 +68,27 @@ public struct SwipeExpansionStyle {
     var minimumExpansionTranslation: CGFloat = 8.0
     
     /**
-     Contructs a new `SwipeExpansionStyle` instance.
-     
-     - parameter target: The relative target expansion threshold. Expansion will occur at the specified value.
-     
-     - parameter additionalTriggers: Additional triggers to useful for determining if expansion should occur.
-     
-     - parameter elasticOverscroll: Specifies if buttons should expand to fully fill overscroll, or expand at a percentage relative to the overscroll.
+     Constructs a new `SwipeExpansionStyle` instance.
 
-     - parameter completionAnimation: Specifies the expansion animation completion style.
-
-     - returns: The new `SwipeExpansionStyle` instance.
+     - parameter target: The relative target expansion threshold.
+     - parameter additionalTriggers: Additional expansion triggers.
+     - parameter elasticOverscroll: Whether buttons fill all overscroll.
+     - parameter completionAnimation: The expansion completion style.
+     - parameter expandedActionLayout: How the primary action is laid out after
+       the regular actions are fully exposed.
      */
-    public init(target: Target, additionalTriggers: [Trigger] = [], elasticOverscroll: Bool = false, completionAnimation: CompletionAnimation = .bounce) {
+    public init(
+        target: Target,
+        additionalTriggers: [Trigger] = [],
+        elasticOverscroll: Bool = false,
+        completionAnimation: CompletionAnimation = .bounce,
+        expandedActionLayout: ExpandedActionLayout = .edgeAligned
+    ) {
         self.target = target
         self.additionalTriggers = additionalTriggers
         self.elasticOverscroll = elasticOverscroll
         self.completionAnimation = completionAnimation
+        self.expandedActionLayout = expandedActionLayout
     }
     
     func shouldExpand(view: Swipeable, gesture: UIPanGestureRecognizer, in superview: UIView, within frame: CGRect? = nil) -> Bool {
@@ -111,7 +118,18 @@ public struct SwipeExpansionStyle {
     }
 }
 
-extension SwipeExpansionStyle {    
+extension SwipeExpansionStyle {
+    /// Describes how the primary action is positioned and sized during expansion.
+    public enum ExpandedActionLayout: Equatable {
+        /// Preserves the original behavior, aligning the primary action to the
+        /// exposed edge once expansion is armed.
+        case edgeAligned
+
+        /// Keeps preceding actions attached to the cell and grows the primary
+        /// action across the remaining exposed width.
+        case fillAvailableSpace
+    }
+
     /// Describes the relative target expansion threshold. Expansion will occur at the specified value.
     public enum Target {
         /// The target is specified by a percentage.
