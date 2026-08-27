@@ -252,15 +252,26 @@ class SwipeController: NSObject {
         
         actionsContainerView.addSubview(actionsView)
         actionsView.addButtons()
+
+        let actionsViewOverlap = max(0, options.actionsViewOverlap)
         
         actionsView.heightAnchor.constraint(equalTo: swipeable.heightAnchor).isActive = true
-        actionsView.widthAnchor.constraint(equalTo: swipeable.widthAnchor).isActive = true
+        actionsView.widthAnchor.constraint(
+            equalTo: swipeable.widthAnchor,
+            constant: actionsViewOverlap
+        ).isActive = true
         actionsView.topAnchor.constraint(equalTo: swipeable.topAnchor).isActive = true
         
         if orientation == .left {
-            actionsView.rightAnchor.constraint(equalTo: actionsContainerView.leftAnchor).isActive = true
+            actionsView.rightAnchor.constraint(
+                equalTo: actionsContainerView.leftAnchor,
+                constant: actionsViewOverlap
+            ).isActive = true
         } else {
-            actionsView.leftAnchor.constraint(equalTo: actionsContainerView.rightAnchor).isActive = true
+            actionsView.leftAnchor.constraint(
+                equalTo: actionsContainerView.rightAnchor,
+                constant: -actionsViewOverlap
+            ).isActive = true
         }
         
         actionsView.setNeedsUpdateConstraints()

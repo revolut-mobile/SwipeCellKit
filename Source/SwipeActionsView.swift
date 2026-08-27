@@ -118,6 +118,14 @@ class SwipeActionsView: UIView {
     private(set) var expanded: Bool = false
     private let actionContentViewBuilder: (SwipeAction) -> ActionContentView
 
+    private var effectiveActionsViewOverlap: CGFloat {
+        max(0, options.actionsViewOverlap)
+    }
+
+    private var actionsLayoutOffset: CGFloat {
+        effectiveActionsViewOverlap * orientation.scale
+    }
+
     var expandableAction: SwipeAction? {
         return options.expansionStyle != nil ? actions.last : nil
     }
@@ -388,6 +396,7 @@ class SwipeActionsView: UIView {
 
         for subview in subviews.enumerated() {
             transitionLayout.layout(view: subview.element, atIndex: subview.offset, with: layoutContext)
+            subview.element.frame.origin.x += actionsLayoutOffset
         }
 
         prepareTransitionsIfNeeded()
@@ -400,7 +409,7 @@ class SwipeActionsView: UIView {
         switch expansionStyle.expandedActionLayout {
         case .edgeAligned:
             if expanded {
-                subviews.last?.frame.origin.x = bounds.origin.x
+                subviews.last?.frame.origin.x = bounds.origin.x + actionsLayoutOffset
             }
         case .fillAvailableSpace:
             layoutFillAvailableSpaceAction()
@@ -416,7 +425,8 @@ class SwipeActionsView: UIView {
 
         let regularButtonWidth = expandableButtonWidth
         let precedingActionsWidth = buttonWidths.dropLast().reduce(0, +)
-        let maximumWidth = max(regularButtonWidth, bounds.width - precedingActionsWidth)
+        let availableWidth = max(0, bounds.width - effectiveActionsViewOverlap)
+        let maximumWidth = max(regularButtonWidth, availableWidth - precedingActionsWidth)
         let expandedWidth = min(
             max(regularButtonWidth, visibleWidth - precedingActionsWidth),
             maximumWidth
