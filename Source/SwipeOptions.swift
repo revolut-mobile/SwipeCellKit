@@ -56,6 +56,10 @@ public struct SwipeOptions {
     /// Custom edge insets of swipe view if not set will be either .zero or calculated from delegate provided visible rect
     public var edgeInsets: UIEdgeInsets?
 
+    /// The distance the action view's clipping boundary extends beneath the swiped content.
+    /// Action button positions remain unchanged. Negative values are treated as zero.
+    public var actionsViewOverlap: CGFloat = 0
+
     /// Sets up left swipe zone. There are two options fractional of cell width and absolute value used by pan gesture.
     public var leftPanZone: PanZoneWidth = .fractional(1)
 

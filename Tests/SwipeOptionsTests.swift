@@ -18,6 +18,7 @@ final class SwipeOptionsTests: XCTestCase {
         }
 
         XCTAssertNil(options.activationThreshold)
+        XCTAssertEqual(options.actionsViewOverlap, 0)
     }
 
     func testExpansionStyleDefaultsToEdgeAlignedLayout() {

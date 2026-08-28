@@ -40,6 +40,38 @@ final class SwipeActionsViewTests: XCTestCase {
         XCTAssertEqual(fixture.view.buttonWidths, [100, 30])
     }
 
+    func testActionsViewOverlapOffsetsRightActionLayout() {
+        var options = SwipeOptions()
+        options.minimumButtonWidth = 20
+        options.maximumButtonWidth = 100
+        options.buttonWidthMode = .individual
+        options.transitionStyle = .reveal
+        options.actionsViewOverlap = 4
+        let fixture = makeActionsView(widths: [40, 80, 60], options: options)
+
+        fixture.view.updateVisibleWidth(180, isInteractive: true)
+
+        XCTAssertEqual(fixture.view.subviews.map { $0.frame.origin.x }, [4, 64, 144])
+    }
+
+    func testActionsViewOverlapOffsetsLeftActionLayout() {
+        var options = SwipeOptions()
+        options.minimumButtonWidth = 20
+        options.maximumButtonWidth = 100
+        options.buttonWidthMode = .individual
+        options.transitionStyle = .reveal
+        options.actionsViewOverlap = 4
+        let fixture = makeActionsView(
+            widths: [40, 80, 60],
+            options: options,
+            orientation: .left
+        )
+
+        fixture.view.updateVisibleWidth(180, isInteractive: true)
+
+        XCTAssertEqual(fixture.view.subviews.map { $0.frame.origin.x }, [-4, -64, -144])
+    }
+
     func testTransitionPreparationOccursOnce() {
         let transition = TransitionSpy()
         let fixture = makeActionsView(widths: [40, 80, 60], transitionDelegate: transition)
