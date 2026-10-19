@@ -7,6 +7,35 @@ import XCTest
 @testable import SwipeCellKit
 
 final class SwipeActionsViewTests: XCTestCase {
+    func testSafeAreaInsetsAreIncludedByDefaultForEachOrientation() {
+        let safeAreaView = TestSafeAreaView()
+        for orientation in [SwipeActionsOrientation.left, .right] {
+            let fixture = makeActionsView(widths: [80], orientation: orientation)
+            fixture.view.safeAreaInsetView = safeAreaView
+            let margin: CGFloat = orientation == .left ? 20 : 40
+
+            fixture.view.updateVisibleWidth(60, isInteractive: true)
+
+            XCTAssertEqual(fixture.view.preferredWidth, 80 + margin)
+            XCTAssertEqual(fixture.view.visibleWidth, 60 - margin)
+        }
+    }
+
+    func testSafeAreaInsetsCanBeExcludedForEachOrientation() {
+        let safeAreaView = TestSafeAreaView()
+        var options = SwipeOptions()
+        options.includesSafeAreaInsets = false
+        for orientation in [SwipeActionsOrientation.left, .right] {
+            let fixture = makeActionsView(widths: [80], options: options, orientation: orientation)
+            fixture.view.safeAreaInsetView = safeAreaView
+
+            fixture.view.updateVisibleWidth(60, isInteractive: true)
+
+            XCTAssertEqual(fixture.view.preferredWidth, 80)
+            XCTAssertEqual(fixture.view.visibleWidth, 60)
+        }
+    }
+
     func testEqualWidthModeUsesWidestPreferredWidthForEveryAction() {
         var options = SwipeOptions()
         options.minimumButtonWidth = 20
@@ -196,5 +225,11 @@ final class SwipeActionsViewTests: XCTestCase {
         XCTAssertEqual(expansionDelegate.changes, [true])
         XCTAssertEqual(fixture.view.buttons.dropLast().map { $0.alpha }, [0.5, 0.5])
         XCTAssertEqual(fixture.view.buttons.dropLast().map { $0.transform.a }, [0.8, 0.8])
+    }
+}
+
+private final class TestSafeAreaView: UIView {
+    override var safeAreaInsets: UIEdgeInsets {
+        UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 40)
     }
 }
