@@ -56,6 +56,10 @@ public struct SwipeOptions {
     /// Custom edge insets of swipe view if not set will be either .zero or calculated from delegate provided visible rect
     public var edgeInsets: UIEdgeInsets?
 
+    /// Whether the action area includes the table/collection view's horizontal safe-area inset.
+    /// Set to `false` when the cell layout already accounts for the horizontal safe area.
+    public var includesSafeAreaInsets: Bool = true
+
     /// The distance the action view's clipping boundary extends beneath the swiped content.
     /// Action button positions remain unchanged. Negative values are treated as zero.
     public var actionsViewOverlap: CGFloat = 0
